@@ -330,7 +330,7 @@ GrowSnake:
     ret
 
 ShrinkSnake:
-
+    push rbx
     mov rax, [SnakeSize]
 
     mov rbx, rax
@@ -361,6 +361,7 @@ ShrinkSnake:
 
     mov qword [SnakeSize], rax
 
+    pop rbx
     ret
 
 ResetSnakeSize:

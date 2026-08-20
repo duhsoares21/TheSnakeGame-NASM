@@ -257,7 +257,9 @@ endif()
 
 if(UNIX AND NOT APPLE)
     set(APPIMAGETOOL_EXECUTABLE "" CACHE FILEPATH "Path to appimagetool for Linux AppImage publishing.")
+    set(APPIMAGE_RUNTIME_FILE "" CACHE FILEPATH "Path to the statically linked type-2 AppImage runtime.")
     option(SNAKE_DOWNLOAD_APPIMAGETOOL "Download appimagetool into the build directory when it is not found." ON)
+    option(SNAKE_DOWNLOAD_APPIMAGE_RUNTIME "Download the statically linked AppImage runtime into the build directory." ON)
 
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
         set(SNAKE_APPIMAGE_ARCH "x86_64")
@@ -279,7 +281,9 @@ if(UNIX AND NOT APPLE)
             -DICON_PNG=${SNAKE_ICON_PNG}
             -DARCH=${SNAKE_APPIMAGE_ARCH}
             -DAPPIMAGETOOL_EXECUTABLE=${APPIMAGETOOL_EXECUTABLE}
+            -DAPPIMAGE_RUNTIME_FILE=${APPIMAGE_RUNTIME_FILE}
             -DDOWNLOAD_APPIMAGETOOL=${SNAKE_DOWNLOAD_APPIMAGETOOL}
+            -DDOWNLOAD_APPIMAGE_RUNTIME=${SNAKE_DOWNLOAD_APPIMAGE_RUNTIME}
             -DTOOLS_DIR=${CMAKE_BINARY_DIR}/tools
             -P ${CMAKE_SOURCE_DIR}/cmake/PackageAppImage.cmake
             COMMENT "Publishing SnakeGame AppImage"

@@ -34,6 +34,10 @@ if(NOT DEFINED DOWNLOAD_APPIMAGETOOL)
     set(DOWNLOAD_APPIMAGETOOL OFF)
 endif()
 
+if(NOT DEFINED DOWNLOAD_APPIMAGE_RUNTIME)
+    set(DOWNLOAD_APPIMAGE_RUNTIME OFF)
+endif()
+
 if(NOT DEFINED TOOLS_DIR)
     set(TOOLS_DIR "${CMAKE_CURRENT_BINARY_DIR}/tools")
 endif()
@@ -176,19 +180,27 @@ if(NOT APPIMAGETOOL_EXECUTABLE)
 endif()
 
 if(NOT APPIMAGETOOL_EXECUTABLE AND DOWNLOAD_APPIMAGETOOL)
-    if(NOT ARCH STREQUAL "x86_64")
+    set(SUPPORTED_APPIMAGE_ARCHITECTURES
+            x86_64
+            i686
+            aarch64
+            armhf
+    )
+
+    if(NOT ARCH IN_LIST SUPPORTED_APPIMAGE_ARCHITECTURES)
         message(FATAL_ERROR
-                "appimagetool was not found and automatic download is only configured for x86_64. Install appimagetool, put it on PATH, or set APPIMAGETOOL_EXECUTABLE."
+                "appimagetool was not found and automatic download is not available for ${ARCH}. Install appimagetool, put it on PATH, or set APPIMAGETOOL_EXECUTABLE."
         )
     endif()
 
-    set(DOWNLOADED_APPIMAGETOOL "${TOOLS_DIR}/appimagetool-x86_64.AppImage")
-    file(MAKE_DIRECTORY "${TOOLS_DIR}")
+    set(APPIMAGETOOL_DIR "${TOOLS_DIR}/appimagetool")
+    set(DOWNLOADED_APPIMAGETOOL "${APPIMAGETOOL_DIR}/appimagetool-${ARCH}.AppImage")
+    file(MAKE_DIRECTORY "${APPIMAGETOOL_DIR}")
 
     if(NOT EXISTS "${DOWNLOADED_APPIMAGETOOL}")
         message(STATUS "Downloading appimagetool to ${DOWNLOADED_APPIMAGETOOL}")
         file(DOWNLOAD
-                "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+                "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${ARCH}.AppImage"
                 "${DOWNLOADED_APPIMAGETOOL}"
                 SHOW_PROGRESS
                 STATUS download_status
@@ -223,6 +235,86 @@ if(NOT APPIMAGETOOL_EXECUTABLE)
     )
 endif()
 
+execute_process(
+        COMMAND "${CMAKE_COMMAND}" -E env
+                "APPIMAGE_EXTRACT_AND_RUN=1"
+                "${APPIMAGETOOL_EXECUTABLE}"
+                --help
+        OUTPUT_VARIABLE appimagetool_help
+        ERROR_VARIABLE appimagetool_help_error
+        RESULT_VARIABLE appimagetool_help_result
+)
+
+if(NOT appimagetool_help_result EQUAL 0 OR
+        NOT "${appimagetool_help}${appimagetool_help_error}" MATCHES "--runtime-file")
+    message(FATAL_ERROR
+            "The configured appimagetool does not support --runtime-file. Use the current AppImage/appimagetool release or enable SNAKE_DOWNLOAD_APPIMAGETOOL."
+    )
+endif()
+
+if(NOT APPIMAGE_RUNTIME_FILE AND DOWNLOAD_APPIMAGE_RUNTIME)
+    set(SUPPORTED_APPIMAGE_ARCHITECTURES
+            x86_64
+            i686
+            aarch64
+            armhf
+    )
+
+    if(NOT ARCH IN_LIST SUPPORTED_APPIMAGE_ARCHITECTURES)
+        message(FATAL_ERROR
+                "The static AppImage runtime cannot be downloaded automatically for ${ARCH}. Set APPIMAGE_RUNTIME_FILE to a compatible runtime."
+        )
+    endif()
+
+    set(APPIMAGE_RUNTIME_DIR "${TOOLS_DIR}/type2-runtime")
+    set(DOWNLOADED_APPIMAGE_RUNTIME "${APPIMAGE_RUNTIME_DIR}/runtime-${ARCH}")
+    file(MAKE_DIRECTORY "${APPIMAGE_RUNTIME_DIR}")
+
+    if(NOT EXISTS "${DOWNLOADED_APPIMAGE_RUNTIME}")
+        message(STATUS "Downloading static AppImage runtime to ${DOWNLOADED_APPIMAGE_RUNTIME}")
+        file(DOWNLOAD
+                "https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-${ARCH}"
+                "${DOWNLOADED_APPIMAGE_RUNTIME}"
+                SHOW_PROGRESS
+                STATUS runtime_download_status
+        )
+
+        list(GET runtime_download_status 0 runtime_download_result)
+        list(GET runtime_download_status 1 runtime_download_message)
+
+        if(NOT runtime_download_result EQUAL 0)
+            file(REMOVE "${DOWNLOADED_APPIMAGE_RUNTIME}")
+            message(FATAL_ERROR
+                    "Could not download the static AppImage runtime: ${runtime_download_message}\n"
+                    "Set APPIMAGE_RUNTIME_FILE to a compatible statically linked type-2 runtime."
+            )
+        endif()
+    endif()
+
+    set(APPIMAGE_RUNTIME_FILE "${DOWNLOADED_APPIMAGE_RUNTIME}")
+endif()
+
+if(NOT APPIMAGE_RUNTIME_FILE OR NOT EXISTS "${APPIMAGE_RUNTIME_FILE}")
+    message(FATAL_ERROR
+            "A statically linked type-2 AppImage runtime is required. Set APPIMAGE_RUNTIME_FILE or enable SNAKE_DOWNLOAD_APPIMAGE_RUNTIME."
+    )
+endif()
+
+find_program(FILE_EXECUTABLE file REQUIRED)
+execute_process(
+        COMMAND "${FILE_EXECUTABLE}" "${APPIMAGE_RUNTIME_FILE}"
+        OUTPUT_VARIABLE appimage_runtime_description
+        ERROR_VARIABLE appimage_runtime_error
+        RESULT_VARIABLE appimage_runtime_result
+)
+
+if(NOT appimage_runtime_result EQUAL 0 OR
+        NOT appimage_runtime_description MATCHES "static")
+    message(FATAL_ERROR
+            "APPIMAGE_RUNTIME_FILE must point to a statically linked type-2 runtime: ${appimage_runtime_error}${appimage_runtime_description}"
+    )
+endif()
+
 file(MAKE_DIRECTORY "${OUTPUT_DIR}")
 
 execute_process(
@@ -230,6 +322,7 @@ execute_process(
                 "ARCH=${ARCH}"
                 "APPIMAGE_EXTRACT_AND_RUN=1"
                 "${APPIMAGETOOL_EXECUTABLE}"
+                --runtime-file "${APPIMAGE_RUNTIME_FILE}"
                 "${APPDIR}"
                 "${OUTPUT_DIR}/SnakeGame-${ARCH}.AppImage"
         RESULT_VARIABLE appimage_result
