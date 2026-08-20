@@ -1,0 +1,94 @@
+# Local IDE and editor state
+.idea/
+.vscode/
+.vs/
+.codex
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+*~
+
+# Operating-system metadata
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# CMake, CTest, CPack, and Ninja generated files
+/build/
+/build-*/
+/cmake-build-*/
+**/CMakeFiles/
+**/.cmake/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest*.txt
+CTestTestfile.cmake
+DartConfiguration.tcl
+CPackConfig.cmake
+CPackSourceConfig.cmake
+compile_commands.json
+build.ninja
+.ninja_deps
+.ninja_log
+Testing/
+_deps/
+vcpkg_installed/
+
+# User-specific CMake configuration (shared CMakePresets.json stays tracked)
+CMakeUserPresets.json
+
+# Compiler and linker output
+*.o
+*.obj
+*.lo
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.exp
+*.map
+*.dSYM/
+
+# Packaged applications and archives
+*.app/
+*.AppImage
+*.dmg
+*.pkg
+*.msi
+*.deb
+*.rpm
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+dist/
+out/
+release/
+artifacts/
+
+# Runtime, profiling, and coverage output
+*.log
+*.profraw
+*.profdata
+*.gcda
+*.gcno
+core
+core.*
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# Keep vendored SDL/SDL_ttf source and packaging assets tracked: CMake needs
+# them for a clean, offline-capable build on Windows, Linux, and macOS.
