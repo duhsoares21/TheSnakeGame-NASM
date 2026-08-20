@@ -15,15 +15,13 @@ The goal is to explore low-level Multiplatform development, graphics rendering, 
 | --- | --- |
 | Windows 11 x64 | ✅ Supported |
 | Windows 10 x64 | ✅ Supported |
-| Windows 8 x64 | ✅ Supported |
-| Windows Vista x64 | ✅ Supported |
 | MacOS x64 | ✅ Supported |
 | MacOS (M Series) | ✅ Supported (Rosetta 2) |
-| Linux x64 | ✅ Supported |
+| Linux x64 (Ubuntu 22.04 and up tested) | ✅ Supported |
 
-- DirectX June 2010 is required to play the Win32 version of the game; DirectX is available as a separate download on the [releases page](https://github.com/duhsoares21/thesnakegame/releases).
-- Windows version available on both Win32 and SDL; SDL Version does not required a separated DirectX Installation.
-- Windows 8 and newer officialy supports Xbox One and Xbox Series X|S Controllers; Windows 7 and older officialy supports Xbox 360 Controllers, but drivers might be required;
+The Game is also available for the x64 versions of Windows XP, Windows Vista, Windows 7 and Windows 8 here: https://github.com/duhsoares21/thesnakegame 
+
+- Windows version available on both Win32 and SDL.
 
 The game targets the native Windows, MacOS and Linux x64 environment.
 
@@ -46,7 +44,7 @@ Features:
 - Classic Snake gameplay
 - Main menu system
 - Keyboard input support
-- Xbox Controller support through XInput (Win32) and Multiple Controllers supported through SDL (All Platforms)
+- Xbox Controller support through XInput (Win32) and Multiple Controllers including Xbox Controller, DualShock 4 and DualSense, supported through SDL (All Platforms)
 - Score tracking
 - Food generation
 - Snake growth mechanics
