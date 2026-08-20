@@ -17,7 +17,7 @@ The goal is to explore low-level Multiplatform development, graphics rendering, 
 | Windows 10 x64 | ✅ Supported |
 | MacOS x64 | ✅ Supported |
 | MacOS (M Series) | ✅ Supported (Rosetta 2) |
-| Linux x64 | ✅ Supported |
+| Linux x64 (Ubuntu 22.04 and up tested) | ✅ Supported |
 
 The Game is also available for the x64 versions of Windows XP, Windows Vista, Windows 7 and Windows 8 here: https://github.com/duhsoares21/thesnakegame 
 
